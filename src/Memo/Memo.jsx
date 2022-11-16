@@ -1,11 +1,20 @@
-import React, { useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Memo.scss";
 import Draggable from "@uuuuooii/draggable";
+import { debounce } from "underscore";
 
 function Memo({ item, Delete, Edit, SetPosition, SetWidthHeight }) {
   const handleRef = useRef(null);
+  const onChangeMemo = useMemo(
+    () => debounce((e) => Edit(item.id, e.target.value), 1000),
+    [item.id, Edit]
+  );
+
+  useEffect(() => {
+    onChangeMemo.cancel();
+  }, [onChangeMemo]);
   return (
     <Draggable
       handleRef={handleRef}
@@ -28,9 +37,10 @@ function Memo({ item, Delete, Edit, SetPosition, SetWidthHeight }) {
         </div>
         <textarea
           className="memo-text-area"
-          // defaultValue={""}
+          defaultValue={item.content}
           name="txt"
           placeholder="Enter memo here"
+          onClick={onChangeMemo}
         ></textarea>
       </div>
     </Draggable>
